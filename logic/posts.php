@@ -162,9 +162,10 @@ function updatePost($request, $post_id, $image)
                         'ii',
                         [$post_id, $tag_id]
                     );
+                    //var_export($o);
                 }
             }
-            return true;
+            return true; 
         }
         return false;
     }

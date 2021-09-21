@@ -42,9 +42,8 @@ function addData($sql, $types, $vals)
     $conn = getConnection();
     if ($conn) {
         if ($types && $vals) {
-            var_export($sql);
+
             $stmt = mysqli_prepare($conn, $sql);
-            var_export($stmt);
             mysqli_stmt_bind_param($stmt, $types, ...$vals);
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
@@ -71,6 +70,7 @@ function editData($sql, $types, $vals)
         }
     }
     mysqli_close($conn);
+    return true;
 }
 
 function deleteData($sql)
