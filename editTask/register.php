@@ -1,4 +1,5 @@
   <?php
+  require_once('./config.php');
   require_once('./helpers/requesthelper.php');
   require_once('./helpers/registervalidation.php');
   $request = validateRequest();

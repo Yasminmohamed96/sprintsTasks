@@ -1,10 +1,10 @@
 <?php
 require_once('../config.php');
-require_once(BASE_PATH . '/logic/posts.php');
+require_once(BASE_PATH . '/logic/users.php');
 require_once(BASE_PATH . '/layout/header.php');
 $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : 1;
 $page_size = 10;
-$order_field = isset($_REQUEST['order_field']) ? $_REQUEST['order_field'] : 'id';
+$order_field = isset($_REQUEST['order_field']) ? $_REQUEST['order_field'] : 'name';
 $order_by = isset($_REQUEST['order_by']) ? $_REQUEST['order_by'] : 'asc';
 $q = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
 function getUrl($page, $q, $order_field, $order_by)
@@ -32,8 +32,13 @@ function getSortFlag($field, $oldOrderField, $oldOrderBy)
     }
     return  "";
 }
-$posts = getMyPosts($page_size, $page, null, $q, $order_field, $order_by);
-$page_count = ceil($posts['count'] / $page_size);
+var_dump($q);
+
+$users = getAllUsers($page_size,$page,$q,$order_field,$order_by);
+var_dump($users);
+
+// `name`, `username`, `password`, `email`, `phone`, `type`, `active`
+$page_count = ceil(getUsersCount() / $page_size);
 /*
 $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
 */
@@ -47,7 +52,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
             <div class="row">
                 <div class="col-lg-12">
                     <div class="text-content">
-                        <h4>My Posts</h4>
+                        <h4>ALL Users</h4>
                     </div>
                 </div>
             </div>
@@ -65,7 +70,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="sidebar-item search">
-                                <form id="search_form" name="gs" method="GET" action="<?= BASE_URL . '/posts.php' ?>">
+                                <form id="search_form" name="gs" method="GET" action="<?= BASE_URL . 'users/index.php' ?>">
                                     <input type="text" value="<?= isset($_REQUEST['q']) ? $_REQUEST['q'] : '' ?>" name="q" class="searchText" placeholder="type to search..." autocomplete="on">
                                     <button type='submit' class='btn btn-primary'>Search</button>
                                 </form>
@@ -75,32 +80,28 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th><a href="<?= getSortingUrl('title', $order_field, $order_by, $q) ?>">Title <?= getSortFlag('title', $order_field, $order_by) ?></a></th>
-                                    <th><a href="<?= getSortingUrl('category_name', $order_field, $order_by, $q) ?>">Category <?= getSortFlag('category_name', $order_field, $order_by) ?></a></th>
-                                    <th>Tags</th>
-                                    <th>Post owner</th>
-                                    <th>Image</th>
-                                    <th><a href="<?= getSortingUrl('publish_date', $order_field, $order_by, $q) ?>">Publish Date <?= getSortFlag('publish_date', $order_field, $order_by) ?></a></th>
+                                    <th><a href="<?= getSortingUrl('name',  $order_field, $order_by,$q) ?>">Name <?= getSortFlag('name', $order_field, $order_by) ?></a></th>
+                                    <th><a href="<?= getSortingUrl('username', $order_field, $order_by, $q) ?>">User Name <?= getSortFlag('username', $order_field, $order_by) ?></a></th>
+                                    <th>Email</th>
+                                    <th>phone</th>
+                                    <th>type</th>
+                                    <th>active</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
                                 $i = 1;
-                                foreach ($posts['data'] as $post) {
-                                    $tags = '';
-                                    foreach ($post['tags'] as $tag) {
-                                        $tags .= "<span class='tag'>{$tag['name']}</tag>";
-                                    }
-                                    $img_src = BASE_URL . '/post_images/' . $post['image'];
+                                foreach ($users as $user) {
                                     echo "<tr>
                                     <td>$i</td>
-                                    <td>{$post['title']}</td>
-                                    <td>{$post['category_name']}</td>
-                                    <td>{$tags}</td>
-                                    <td>{$post['user_name']}</td>
-                                    <td><img src='{$img_src}' width='200' height='200'/></td>
-                                    <td>{$post['publish_date']}</td>
+                                    <td>{$user['name']}</td>
+                                    <td>{$user['username']}</td>
+                                    <td>{$user['email']}</td>
+                                    <td>{$user['phone']}</td>
+                                    <td>{$user['type']}</td>
+                                    <td>{$user['active']}</td>
+                                    <td><a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$user['id']}' class='btn btn-danger'>Delete</a></td>
                                     <td>
                                    
                                     </td>

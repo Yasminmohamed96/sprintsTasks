@@ -47,7 +47,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
             <div class="row">
                 <div class="col-lg-12">
                     <div class="text-content">
-                        <h4>My Posts</h4>
+                        <h4>ALL Posts</h4>
                     </div>
                 </div>
             </div>
@@ -65,7 +65,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="sidebar-item search">
-                                <form id="search_form" name="gs" method="GET" action="<?= BASE_URL . '/posts.php' ?>">
+                                <form id="search_form" name="gs" method="GET" action="<?= BASE_URL . 'admin/index.php' ?>">
                                     <input type="text" value="<?= isset($_REQUEST['q']) ? $_REQUEST['q'] : '' ?>" name="q" class="searchText" placeholder="type to search..." autocomplete="on">
                                     <button type='submit' class='btn btn-primary'>Search</button>
                                 </form>
@@ -79,6 +79,8 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                     <th><a href="<?= getSortingUrl('category_name', $order_field, $order_by, $q) ?>">Category <?= getSortFlag('category_name', $order_field, $order_by) ?></a></th>
                                     <th>Tags</th>
                                     <th>Post owner</th>
+                                    <th>Comments Counts</th>
+                                    <th>likes Counts</th>
                                     <th>Image</th>
                                     <th><a href="<?= getSortingUrl('publish_date', $order_field, $order_by, $q) ?>">Publish Date <?= getSortFlag('publish_date', $order_field, $order_by) ?></a></th>
                                     <th>Action</th>
@@ -99,8 +101,11 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                     <td>{$post['category_name']}</td>
                                     <td>{$tags}</td>
                                     <td>{$post['user_name']}</td>
+                                    <td>{$post['comments']}</td>
+                                    <td>{$post['like_scount']}</td>
                                     <td><img src='{$img_src}' width='200' height='200'/></td>
                                     <td>{$post['publish_date']}</td>
+                                    <td><a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$post['id']}' class='btn btn-danger'>Delete</a></td>
                                     <td>
                                    
                                     </td>

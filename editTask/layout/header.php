@@ -4,7 +4,12 @@ if (session_status() != PHP_SESSION_ACTIVE) session_start();
 $current_page = 'home';
 if (str_contains($_SERVER['REQUEST_URI'], '/posts.php')) $current_page = 'posts';
 if (str_contains($_SERVER['REQUEST_URI'], '/myposts')) $current_page = 'myposts';
+if (str_contains($_SERVER['REQUEST_URI'], '/users')) $current_page = 'users';
+if (str_contains($_SERVER['REQUEST_URI'], '/admin')) $current_page = 'adminAllposts';
+if (str_contains($_SERVER['REQUEST_URI'], '/login.php')) $current_page = 'login';
+if (str_contains($_SERVER['REQUEST_URI'], '/register.php')) $current_page = 'register';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -82,7 +87,14 @@ https://templatemo.com/tm-551-stand-blog
                             if (isset($_SESSION['user']['type']) && $_SESSION['user']['type'] == 1) {
                             ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="admin.php">Admin</a>
+                            <?= ($current_page == 'adminAllposts' ? "<span class='sr-only'>(current)</span>" : "") ?>
+                                <a class="nav-link" href="<?= BASE_URL . 'admin/index.php'?>">All Posts </a>
+                                
+                            </li>
+                            <li class="nav-item <?= ($current_page == 'users' ? "active" : "") ?>">
+                            <?= ($current_page == 'users' ? "<span class='sr-only'>(current)</span>" : "") ?> 
+                            <a class="nav-link" href="<?= BASE_URL . '/users/index.php' ?>">ALL Users</a>
+                             
                             </li>
                             <?php
                             }
@@ -96,11 +108,12 @@ https://templatemo.com/tm-551-stand-blog
                             <?php
                         } else {
                         ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="login.php">Login</a>
+                            <li class="nav-item <?= ($current_page == 'login' ? "active" : "") ?>">
+                                
+                                <a class="nav-link" href="<?= BASE_URL . '/login.php'?>">Login</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="register.php">Register</a>
+                            <li class="nav-item   <?= ($current_page == 'register' ? "active" : "") ?>">
+                                <a class="nav-link" href="<?= BASE_URL . '/register.php'?>">Register</a>
                             </li>
                             <?php
                         }
