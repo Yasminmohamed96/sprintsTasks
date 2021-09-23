@@ -71,6 +71,14 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                 </form>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6"> <a class="btn btn-primary" href="export.php" target="_blank">Export</a></div>
+                            <div class="col-md-6">
+                                <form action="import.php" method="POST" enctype="multipart/form-data">
+                                    <button class="btn btn-primary">Import</button>
+                                    <input type="file" name="csv" style="width: 100px;display:inline" />
+                                </form>
+                            </div>
                         <table class="table">
                             <thead>
                                 <tr>

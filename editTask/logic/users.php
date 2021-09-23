@@ -13,7 +13,8 @@ function getAllUsers(
     $offset = ($page - 1) * $page_size;
     $types = '';
     $vals = [];
-    $sql = "SELECT * FROM users WHERE 1=1";
+    $sql = "SELECT  *
+    FROM users WHERE 1=1";
     if ($q != null) {
         $types .= 'ssi';
         
@@ -47,6 +48,22 @@ function getUsersCount()
     $sql = "SELECT count(0) as cnt FROM users"; 
         return  getRow($sql)['cnt'];
 }
+function addNewUser($request)
+{
+    $sql = "INSERT INTO users (id,name,username,password,email,phone,type,active)
+    VALUES (null,?,?,?,?,?,?,?)";
+    $post_id = addData($sql, 'ssssiii', [
+        $request['name'],
+        $request['username'],
+        $request['password'],
+        $request['email'],
+        $request['phone'],
+        $request['type'],
+        $request['active'],
+    ]);
+    
+  return true;
+}
 function blockUser($user_id, $admin_id)
 {
     $sql = "INSERT INTO blocks (id,user_id,admin_id) VALUES (null,?,?)";
@@ -56,6 +73,28 @@ function unblockUser($user_id, $admin_id)
 {
     $sql = "DELETE FROM blocks WHERE user_id=? AND admin_id=?";
     execute($sql, 'ii', [$user_id, $admin_id]);
+}
+
+function validateUserCreate($request)
+{
+    $errors = [];
+    return $errors;
+}
+function getUserById($id)
+{
+    $sql = "SELECT * FROM users WHERE id=?";
+    $user = getRow($sql, 'i', [$id]);
+   
+    return $user;
+}
+function checkIfUserIsAdmin($user)
+{
+    if (session_status() != PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    if (!isset($_SESSION['user']))
+        return false;
+    return $_SESSION['user']['type'] == 1;
 }
 
 ?>
