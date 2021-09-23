@@ -39,7 +39,7 @@
     }
   }
 </script>
-
+<script src="<?= BASE_URL ?>/assets/js/user.js"></script>
 </body>
 
 </html>

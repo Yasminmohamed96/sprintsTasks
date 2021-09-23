@@ -7,6 +7,7 @@ function getAllUsers(
     $q = null,
     $order_field = "name",
     $order_by = "desc",
+    $block_by_user_id = null
 ) {
 
     $offset = ($page - 1) * $page_size;
@@ -26,11 +27,35 @@ function getAllUsers(
     
     $users =  getRows($sql,$types, $vals);
 
+    for ($i = 0; $i < count($users); $i++) {
+        if ($block_by_user_id) {
+            $users[$i]['block_by_me'] = getIfBlockedByMe($users[$i]['id'], $block_by_user_id);
+        } else
+            $users[$i]['block_by_me'] = false;
+    }
+
     return $users;
+}
+
+function getIfBlockedByMe($user_id, $admin_id)
+{
+    $sql = "SELECT id FROM blocks WHERE user_id=? and admin_id=?";
+    return getRow($sql, 'ii', [$user_id, $admin_id]) != null;
 }
 function getUsersCount()
 {
     $sql = "SELECT count(0) as cnt FROM users"; 
         return  getRow($sql)['cnt'];
 }
+function blockUser($user_id, $admin_id)
+{
+    $sql = "INSERT INTO blocks (id,user_id,admin_id) VALUES (null,?,?)";
+    execute($sql, 'ii', [$user_id, $admin_id]);
+}
+function unblockUser($user_id, $admin_id)
+{
+    $sql = "DELETE FROM blocks WHERE user_id=? AND admin_id=?";
+    execute($sql, 'ii', [$user_id, $admin_id]);
+}
+
 ?>

@@ -38,25 +38,15 @@ function getRow($sql, $types = null, $vals = null)
 
 function addData($sql, $types, $vals)
 {
-
-    $conn = getConnection();
-    if ($conn) {
-        if ($types && $vals) {
-
-            $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, $types, ...$vals);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-        } else {
-            mysqli_query($conn, $sql);
-        }
-    }
-    $lastId = mysqli_insert_id($conn);
-    mysqli_close($conn);
-    return $lastId;
+    return execute($sql, $types, $vals, true);
 }
 
 function editData($sql, $types, $vals)
+{
+    return execute($sql, $types, $vals);
+}
+
+function execute($sql, $types, $vals, $returnLastId = false)
 {
     $conn = getConnection();
     if ($conn) {
@@ -69,8 +59,12 @@ function editData($sql, $types, $vals)
             mysqli_query($conn, $sql);
         }
     }
+    if ($returnLastId)
+        $lastId = mysqli_insert_id($conn);
     mysqli_close($conn);
-    return true;
+    if (isset($lastId))
+        return $lastId;
+    return 1;
 }
 
 function deleteData($sql)

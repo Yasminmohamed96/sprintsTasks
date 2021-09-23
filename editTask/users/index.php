@@ -32,10 +32,13 @@ function getSortFlag($field, $oldOrderField, $oldOrderBy)
     }
     return  "";
 }
-var_dump($q);
-
-$users = getAllUsers($page_size,$page,$q,$order_field,$order_by);
-var_dump($users);
+function getUserId()
+{
+    if (session_status() != PHP_SESSION_ACTIVE) session_start();
+    if (isset($_SESSION['user'])) return $_SESSION['user']['id'];
+    return 0;
+}
+$users = getAllUsers($page_size,$page,$q,$order_field,$order_by,getUserId());
 
 // `name`, `username`, `password`, `email`, `phone`, `type`, `active`
 $page_count = ceil(getUsersCount() / $page_size);
@@ -93,6 +96,10 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                 <?php
                                 $i = 1;
                                 foreach ($users as $user) {
+                                    $blockID="block_btn_".$user['id'];
+                                    $blockDISPLAY=!$user['block_by_me'] ? "block" : "none" ;
+                                    $unblockID="unblock_btn_".$user['id'];
+                                    $unblockDISPLAY=!$user['block_by_me'] ? "none" : "block" ;
                                     echo "<tr>
                                     <td>$i</td>
                                     <td>{$user['name']}</td>
@@ -101,11 +108,11 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                     <td>{$user['phone']}</td>
                                     <td>{$user['type']}</td>
                                     <td>{$user['active']}</td>
-                                    <td><a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$user['id']}' class='btn btn-danger'>Delete</a></td>
                                     <td>
-                                   
-                                    </td>
-                                    </tr>";
+                                    <a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$user['id']}' class='btn btn-danger'>Delete</a>
+                                    <button id={$blockID} class ='btn' type='button' onclick='blockUser({$user['id']})' style='display:{$blockDISPLAY}'>Block</button>
+                                    <button id={$unblockID} class ='btn' type='button' onclick='unblockUser({$user['id']})' style='display:{$unblockDISPLAY}'>unBlock</button>
+                                    </td></tr>";
 
                                     $i++;
                                 }
