@@ -2,11 +2,13 @@
 
 if (session_status() != PHP_SESSION_ACTIVE) session_start();
 $current_page = 'home';
+
 if (str_contains($_SERVER['REQUEST_URI'], '/posts.php')) $current_page = 'posts';
 if (str_contains($_SERVER['REQUEST_URI'], '/myposts')) $current_page = 'myposts';
 if (str_contains($_SERVER['REQUEST_URI'], '/users')) $current_page = 'users';
 if (str_contains($_SERVER['REQUEST_URI'], '/admin')) $current_page = 'adminAllposts';
 if (str_contains($_SERVER['REQUEST_URI'], '/login.php')) $current_page = 'login';
+if (str_contains($_SERVER['REQUEST_URI'], '/allusers.php')) $current_page = 'allusers';
 if (str_contains($_SERVER['REQUEST_URI'], '/register.php')) $current_page = 'register';
 ?>
 
@@ -45,13 +47,7 @@ https://templatemo.com/tm-551-stand-blog
     <body>
 
         <!-- ***** Preloader Start ***** -->
-        <div id="preloader">
-            <div class="jumper">
-                <div></div>
-                <div></div>
-                <div></div>
-            </div>
-        </div>
+        
         <!-- ***** Preloader End ***** -->
 
         <!-- Header -->
@@ -102,8 +98,11 @@ https://templatemo.com/tm-551-stand-blog
                             <li class="nav-item <?= ($current_page == 'myposts' ? "active" : "") ?>">
                                 <a class="nav-link" href="<?= BASE_URL . '/myposts' ?>">My Posts</a>
                             </li>
+                            <li class="nav-item <?= ($current_page == 'allusers' ? "active" : "") ?>">
+                                <a class="nav-link" href="<?= BASE_URL . 'allusers.php' ?>">follow users</a>
+                            </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="logout.php">Logout</a>
+                                <a class="nav-link" href="<?= BASE_URL .'/logout.php'?>">Logout</a>
                             </li>
                             <?php
                         } else {
@@ -114,6 +113,9 @@ https://templatemo.com/tm-551-stand-blog
                             </li>
                             <li class="nav-item   <?= ($current_page == 'register' ? "active" : "") ?>">
                                 <a class="nav-link" href="<?= BASE_URL . '/register.php'?>">Register</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= BASE_URL .'/logout.php'?>">Logout</a>
                             </li>
                             <?php
                         }

@@ -7,7 +7,8 @@ function getAllUsers(
     $q = null,
     $order_field = "name",
     $order_by = "desc",
-    $block_by_user_id = null
+    $block_by_user_id = null,
+    $follow_by_me=null
 ) {
 
     $offset = ($page - 1) * $page_size;
@@ -32,12 +33,21 @@ function getAllUsers(
         if ($block_by_user_id) {
             $users[$i]['block_by_me'] = getIfBlockedByMe($users[$i]['id'], $block_by_user_id);
         } else
-            $users[$i]['block_by_me'] = false;
+        {$users[$i]['block_by_me'] = false;}
+        if ($follow_by_me) {
+            $users[$i]['follow_by_me'] = getIfFollowedByMe($follow_by_me,$users[$i]['id']);
+        } else
+            $users[$i]['follow_by_me'] = false;    
     }
 
     return $users;
 }
 
+function getIfFollowedByMe($myid, $user_id)
+{
+    $sql = "SELECT id FROM follows WHERE follower_id=? and following_id=?";
+    return getRow($sql, 'ii', [$myid, $user_id]) != null;
+}
 function getIfBlockedByMe($user_id, $admin_id)
 {
     $sql = "SELECT id FROM blocks WHERE user_id=? and admin_id=?";
@@ -64,6 +74,14 @@ function addNewUser($request)
     
   return true;
 }
+function editUser($id, $request)
+{
+    $types = 'sssiiii';
+    $vals = [$request['name'], $request['username'], $request['email'], $request['phone'], $request['type'], $request['active'],$id];
+    $sql = "UPDATE users SET name=?,username=?,email=?,phone=?,type=?,active=? WHERE id=?";
+    
+    return editData($sql, $types, $vals);
+}
 function blockUser($user_id, $admin_id)
 {
     $sql = "INSERT INTO blocks (id,user_id,admin_id) VALUES (null,?,?)";
@@ -75,15 +93,18 @@ function unblockUser($user_id, $admin_id)
     execute($sql, 'ii', [$user_id, $admin_id]);
 }
 
-function validateUserCreate($request)
-{
-    $errors = [];
-    return $errors;
-}
+
 function getUserById($id)
 {
     $sql = "SELECT * FROM users WHERE id=?";
     $user = getRow($sql, 'i', [$id]);
+   
+    return $user;
+}
+function getUserByEmail($email)
+{
+    $sql = "SELECT * FROM users WHERE email=?";
+    $user = getRow($sql, 's', [$email]);
    
     return $user;
 }
@@ -97,4 +118,29 @@ function checkIfUserIsAdmin($user)
     return $_SESSION['user']['type'] == 1;
 }
 
+function validateUserCreate($request)
+{
+    $errors = [];
+    return $errors;
+}
+function validateUserEdit($request)
+{
+    return validateUserCreate($request);
+}
+
+function followUser($myid, $user_id)
+{
+    $sql = "INSERT INTO follows (id,follower_id ,following_id) VALUES (null,?,?)";
+    execute($sql, 'ii', [$myid, $user_id]);
+}
+function unfollowUser($myid, $user_id)
+{
+    $sql = "DELETE FROM follows WHERE follower_id=? AND following_id=?";
+    execute($sql, 'ii', [$myid, $user_id]);
+}
+function deleteUser($id)
+{
+    $sql = "DELETE FROM users WHERE id=?";
+    execute($sql, 'i', [$id]);
+}
 ?>

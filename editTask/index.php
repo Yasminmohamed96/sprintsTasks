@@ -142,13 +142,13 @@ $tags = getTags();
                   </div>
                   <div class="down-content">
                     <span><?= $post['category_name'] ?></span>
-                    <a href="<?= BASE_URL . '/post-details.php?id=' . $post['id'] ?>">
+                    <a href="<?= BASE_URL . '/post-details.php?view=' . $post['id'] ?>">
                       <h4><?= $post['title'] ?></h4>
                     </a>
                     <ul class="post-info">
-                      <li><a href="#"><?= $post['user_name'] ?></a></li>
-                      <li><a href="#"><?= $post['publish_date'] ?></a></li>
-                      <li><a href="#"><?= $post['comments'] ?> Comments</a></li>
+                      <li><a href="<?= BASE_URL . '/post-details.php?view=' . $post['id'] ?>"><?= $post['user_name'] ?></a></li>
+                      <li><a href="<?= BASE_URL . '/post-details.php?view=' . $post['id'] ?>"><?= $post['publish_date'] ?></a></li>
+                      <li><a href="<?= BASE_URL . '/post-details.php?view=' . $post['id'] ?>"><?= $post['comments'] ?> Comments</a></li>
                     </ul>
                     <p><?= $post['content'] ?></p>
                     <?php

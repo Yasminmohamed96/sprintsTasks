@@ -54,6 +54,9 @@ require_once(BASE_PATH . '/layout/header.php');
                                 <textarea name="username" placeholder="username" class="form-control"></textarea>
                                 <?= isset($errors['username']) ? "<span class='text-danger'>" . $errors['username'] . "</span>" : "" ?>
 
+                                <input name="password" placeholder="password" class="form-control" />
+                                <?= isset($errors['password']) ? "<span class='text-danger'>" . $errors['password'] . "</span>" : "" ?>
+
                                 <label>email<input type="email" name="email" class="form-control"></label>
                                 <?= isset($errors['email']) ? "<span class='text-danger'>" . $errors['email'] . "</span>" : "" ?>
                                  

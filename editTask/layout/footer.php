@@ -40,6 +40,8 @@
   }
 </script>
 <script src="<?= BASE_URL ?>/assets/js/user.js"></script>
+<script src="<?= BASE_URL ?>/assets/js/comment.js"></script>
+<script src="<?= BASE_URL ?>/assets/js/follow.js"></script>
 </body>
 
 </html>

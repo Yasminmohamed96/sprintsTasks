@@ -5,6 +5,7 @@ require_once(BASE_PATH . '/logic/categories.php');
 $category_id = isset($_REQUEST['category_id']) ? $_REQUEST['category_id'] : null;
 $tag_id = isset($_REQUEST['tag_id']) ? $_REQUEST['tag_id'] : null;
 $q = isset($_REQUEST['q']) ? $_REQUEST['q'] : null;
+
 $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : 1;
 $page_size = 6;
 $posts = getPosts($page_size, $page, $category_id, $tag_id, null, $q);
@@ -56,6 +57,7 @@ function getUrl($p,$category_id,$tag_id,$q)
                     <div class="row">
                         <?php
                         foreach ($posts as $post) {
+                            $view_url=BASE_URL . 'post-details.php?view=' . $post['id'];
                         ?>
                             <div class="col-lg-6">
                                 <div class="blog-post">
@@ -64,13 +66,13 @@ function getUrl($p,$category_id,$tag_id,$q)
                                     </div>
                                     <div class="down-content">
                                         <span><?= $post['category_name'] ?></span>
-                                        <a href="<?= BASE_URL . '/post-details.php?id=' . $post['id'] ?>">
+                                        <a href="<?= BASE_URL . '/post-details.php?view=' . $post['id'] ?>">
                                             <h4><?= $post['title'] ?></h4>
                                         </a>
                                         <ul class="post-info">
-                                            <li><a href="#"><?= $post['user_name'] ?></a></li>
-                                            <li><a href="#"><?= $post['publish_date'] ?></a></li>
-                                            <li><a href="#"><?= $post['comments'] ?> Comments</a></li>
+                                            <li><a href="<?= $view_url;?>"><?= $post['user_name'] ?></a></li>
+                                            <li><a href="<?= $view_url;?>"><?= $post['publish_date'] ?></a></li>
+                                            <li><a href="<?= $view_url;?>"><?= $post['comments'] ?> Comments</a></li>
                                         </ul>
                                         <p><?= $post['content'] ?></p>
                                         <?php

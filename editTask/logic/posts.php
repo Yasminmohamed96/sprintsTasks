@@ -141,6 +141,7 @@ function getUploadedImage($files)
 {
     $strArr = explode('.', $files['image']['name']);
     $ext = $strArr[count($strArr) - 1];
+    
     array_pop($strArr);
     $fileName = implode('.', $strArr) . '_' . strtotime("now") . '.' . $ext;
     move_uploaded_file($files['image']['tmp_name'], BASE_PATH . '/post_images/' . $fileName);
@@ -220,4 +221,82 @@ function unlikePost($id, $user_id)
 {
     $sql = "DELETE FROM likes WHERE post_id=? AND user_id=?";
     execute($sql, 'ii', [$id, $user_id]);
+}
+
+function getPostToView($id) {
+
+    $sql = "SELECT p.*,c.name AS category_name,u.name AS user_name FROM posts p
+    INNER JOIN categories c ON c.id=p.category_id
+    INNER JOIN users u ON u.id=p.user_id
+    WHERE p.id=?";
+    $post = getRow($sql, 'i', [$id]);
+    $sql = "SELECT tag_id FROM post_tags WHERE post_id=?";
+    $post['tags'] = getRows($sql, 'i', [$id]);
+    $post['comments'] = getPostCommentsCount($id);
+    $post['tags'] = getPostTags($id);
+    $post['like_scount'] = getLikesCount($id);
+    
+
+    return $post;
+}
+function getIfLikedCommentByMe($comment_id, $user_id)
+{
+    $sql = "SELECT id FROM comment_likes WHERE comment_id=? and user_id=?";
+    return getRow($sql, 'ii', [$comment_id, $user_id]) != null;
+}
+function getPostComments($id, $likeComment_by_user_id = null)
+{
+    $sql = "SELECT c.*,u.username FROM comments c INNER JOIN users u ON c.user_id=u.id WHERE c.post_id=? ";
+    $comments = getRows($sql, 'i', [$id]);
+    for ($i = 0; $i < count($comments); $i++) 
+    {
+    if ($likeComment_by_user_id) 
+    {
+        $comments[$i]['likedComment_by_me'] = getIfLikedCommentByMe( $comments[$i]['id'], $likeComment_by_user_id);
+    } 
+    else
+    {
+        $comments[$i]['likedComment_by_me'] = false;
+    }
+}
+    return  $comments;
+}
+function addNewComment($request,$post_id,$user_id)
+{
+    
+    $sql = "INSERT INTO comments(id,comment,comment_date,post_id,user_id)
+    VALUES (null,?,?,?,?)";
+    $comment_id = addData($sql, 'ssii', [
+        $request['comment'],
+        $request['date'],
+        $post_id,
+        $user_id
+       
+    ]);
+    return true;
+}
+
+
+function likeComment($id, $user_id)
+{
+    $sql = "INSERT INTO comment_likes (id,comment_id,user_id) VALUES (null,?,?)";
+    execute($sql, 'ii', [$id, $user_id]);
+}
+function unlikeComment($id, $user_id)
+{
+    $sql = "DELETE FROM comment_likes WHERE comment_id=? AND user_id=?";
+    execute($sql, 'ii', [$id, $user_id]);
+}
+function thisIsMyPost($post_id,$user_id)
+{
+$post=getPostById($post_id);
+if(($post['user_id'])==$user_id)
+return true;
+else return false;
+}
+function deleteComment($id)
+{
+    
+    $sql = "DELETE FROM comments WHERE id=?";
+    execute($sql, 'i', [$id]);
 }

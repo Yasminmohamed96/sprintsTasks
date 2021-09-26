@@ -1,25 +1,25 @@
 <?php
-require_once('../config.php');
-require_once(BASE_PATH . '/logic/posts.php');
+require_once('config.php');
+require_once(BASE_PATH . '/logic/users.php');
 require_once(BASE_PATH . '/layout/header.php');
 $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : 1;
 $page_size = 10;
-$order_field = isset($_REQUEST['order_field']) ? $_REQUEST['order_field'] : 'id';
+$order_field = isset($_REQUEST['order_field']) ? $_REQUEST['order_field'] : 'name';
 $order_by = isset($_REQUEST['order_by']) ? $_REQUEST['order_by'] : 'asc';
 $q = isset($_REQUEST['q']) ? $_REQUEST['q'] : '';
 function getUrl($page, $q, $order_field, $order_by)
 {
-    return "index.php?page=$page&q=$q&order_field=$order_field&order_by=$order_by";
+    return "allusers.php?page=$page&q=$q&order_field=$order_field&order_by=$order_by";
 }
 function getSortingUrl($field, $oldOrderField, $oldOrderBy, $q)
 {
     if ($field == $oldOrderField && $oldOrderBy == 'asc') {
-        return "index.php?page=1&q=$q&order_field=$field&order_by=desc";
+        return "allusers.php?page=1&q=$q&order_field=$field&order_by=desc";
     }
     if ($field == $oldOrderField && $oldOrderBy == 'desc') {
-        return "index.php?page=1&q=$q";
+        return "allusers.php?page=1&q=$q";
     }
-    return  "index.php?page=1&q=$q&order_field=$field&order_by=asc";
+    return  "allusers.php?page=1&q=$q&order_field=$field&order_by=asc";
 }
 
 function getSortFlag($field, $oldOrderField, $oldOrderBy)
@@ -32,8 +32,16 @@ function getSortFlag($field, $oldOrderField, $oldOrderBy)
     }
     return  "";
 }
-$posts = getMyPosts($page_size, $page, null, $q, $order_field, $order_by);
-$page_count = ceil($posts['count'] / $page_size);
+function getUserId()
+{
+    if (session_status() != PHP_SESSION_ACTIVE) session_start();
+    if (isset($_SESSION['user'])) return $_SESSION['user']['id'];
+    return 0;
+}
+$users = getAllUsers($page_size,$page,$q,$order_field,$order_by,getUserId(),getUserId());
+
+// `name`, `username`, `password`, `email`, `phone`, `type`, `active`
+$page_count = ceil(getUsersCount() / $page_size);
 /*
 $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
 */
@@ -47,7 +55,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
             <div class="row">
                 <div class="col-lg-12">
                     <div class="text-content">
-                        <h4>ALL Posts</h4>
+                        <h4>ALL Users</h4>
                     </div>
                 </div>
             </div>
@@ -60,69 +68,47 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
     <div class="container">
 
         <div class="row">
+
             <div class="col-lg-12">
                 <div class="all-blog-posts">
                     <div class="row">
-                    <div class="col-md-2"><a href="add.php" class="btn btn-success">Add Post</a></div>
-                        <div class="col-lg-10">
+                        <div class="col-lg-12">
                             <div class="sidebar-item search">
-                                <form id="search_form" name="gs" method="GET" action="<?= BASE_URL . 'admin/index.php' ?>">
+                                <form id="search_form" name="gs" method="GET" action="<?= BASE_URL . 'allusers.php' ?>">
                                     <input type="text" value="<?= isset($_REQUEST['q']) ? $_REQUEST['q'] : '' ?>" name="q" class="searchText" placeholder="type to search..." autocomplete="on">
                                     <button type='submit' class='btn btn-primary'>Search</button>
                                 </form>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-6"> <a class="btn btn-primary" href="<?= BASE_URL.'myposts/export.php'?>" target="_blank">Export</a></div>
-                            <div class="col-md-6">
-                                <form action="<?= BASE_URL.'myposts/import.php'?>" method="POST" enctype="multipart/form-data">
-                                    <button class="btn btn-primary">Import</button>
-                                    <input type="file" name="csv" style="width: 100px;display:inline" />
-                                </form>
-                            </div>
+                       
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th><a href="<?= getSortingUrl('title', $order_field, $order_by, $q) ?>">Title <?= getSortFlag('title', $order_field, $order_by) ?></a></th>
-                                    <th><a href="<?= getSortingUrl('category_name', $order_field, $order_by, $q) ?>">Category <?= getSortFlag('category_name', $order_field, $order_by) ?></a></th>
-                                    <th>Tags</th>
-                                    <th>Post owner</th>
-                                    <th>Comments Counts</th>
-                                    <th>likes Counts</th>
-                                    <th>Image</th>
-                                    <th><a href="<?= getSortingUrl('publish_date', $order_field, $order_by, $q) ?>">Publish Date <?= getSortFlag('publish_date', $order_field, $order_by) ?></a></th>
+                                    <th><a href="<?= getSortingUrl('name',  $order_field, $order_by,$q) ?>">Name <?= getSortFlag('name', $order_field, $order_by) ?></a></th>
+                                    <th><a href="<?= getSortingUrl('username', $order_field, $order_by, $q) ?>">User Name <?= getSortFlag('username', $order_field, $order_by) ?></a></th>
+                                   
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php
                                 $i = 1;
-                                foreach ($posts['data'] as $post) {
-                                    $tags = '';
-                                    foreach ($post['tags'] as $tag) {
-                                        $tags .= "<span class='tag'>{$tag['name']}</tag>";
-                                    }
-                                    $img_src = BASE_URL . '/post_images/' . $post['image'];
-                                    $view_url=BASE_URL . 'post-details.php?view=' . $post['id'];
+                                foreach ($users as $user) {
+                                    $followID="follow_btn_".$user['id'];
+                                    $followDISPLAY=!$user['follow_by_me'] ? "block" : "none" ;
+                                    $unfollowID="unfollow_btn_".$user['id'];
+                                    $unfollowDISPLAY=!$user['follow_by_me'] ? "none" : "block" ;
                                     echo "<tr>
                                     <td>$i</td>
-                                    <td>{$post['title']}</td>
-                                    <td>{$post['category_name']}</td>
-                                    <td>{$tags}</td>
-                                    <td>{$post['user_name']}</td>
-                                    <td>{$post['comments']}</td>
-                                    <td>{$post['like_scount']}</td>
-                                    <td><img src='{$img_src}' width='200' height='200'/></td>
-                                    <td>{$post['publish_date']}</td>
-                                    <td><a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$post['id']}' class='btn btn-danger'>Delete</a></td>
-                                    <td><a  href='{$view_url}' class='btn btn-danger'>view</a></td>
-
+                                    <td>{$user['name']}</td>
+                                    <td>{$user['username']}</td>
                                     
                                     <td>
                                    
-                                    </td>
-                                    </tr>";
+                                    <button id={$followID} class ='btn' type='button' onclick='followUser({$user['id']})' style='display:{$followDISPLAY}'>Follow</button>
+                                    <button id={$unfollowID} class ='btn' type='button' onclick='unfollowUser({$user['id']})' style='display:{$unfollowDISPLAY}'>unfollow</button>
+                                    </td></tr>";
 
                                     $i++;
                                 }

@@ -1,6 +1,7 @@
 <?php
 require_once('../config.php');
 require_once(BASE_PATH . '/logic/posts.php');
+require_once(BASE_PATH . '/logic/auth.php');
 require_once(BASE_PATH . '/layout/header.php');
 $page = isset($_REQUEST['page']) ? $_REQUEST['page'] : 1;
 $page_size = 10;
@@ -31,12 +32,6 @@ function getSortFlag($field, $oldOrderField, $oldOrderBy)
         return "<i class='fa fa-sort-down'></i>";
     }
     return  "";
-}
-function getUserId()
-{
-    if (session_status() != PHP_SESSION_ACTIVE) session_start();
-    if (isset($_SESSION['user'])) return $_SESSION['user']['id'];
-    return 0;
 }
 
 $posts = getMyPosts($page_size, $page, getUserId(), $q, $order_field, $order_by);
@@ -71,10 +66,19 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                 <div class="all-blog-posts">
                     <div class="row">
                         <div class="col-md-2"><a href="add.php" class="btn btn-success">Add Post</a></div>
-                        <div class="col-md-10">
+                        <div class="col-md-12">
                             <div class="sidebar-item search">
                                 <form id="search_form" name="gs" method="GET" action="">
                                     <input type="text" class="form-control" value="<?= isset($_REQUEST['q']) ? $_REQUEST['q'] : '' ?>" name="q" class="searchText" placeholder="type to search..." autocomplete="on">
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6"> <a class="btn btn-primary" href="export.php" target="_blank">Export</a></div>
+                            <div class="col-md-6">
+                                <form action="import.php" method="POST" enctype="multipart/form-data">
+                                    <button class="btn btn-primary">Import</button>
+                                    <input type="file" name="csv" style="width: 100px;display:inline" />
                                 </form>
                             </div>
                         </div>
@@ -92,7 +96,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                             </thead>
                             <tbody>
                                 <?php
-                                $i = 1;
+                                $i = ($page - 1) * $page_size + 1;
                                 foreach ($posts['data'] as $post) {
                                     $tags = '';
                                     foreach ($post['tags'] as $tag) {
@@ -101,13 +105,15 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                     $img_src = BASE_URL . '/post_images/' . $post['image'];
                                     echo "<tr>
                                     <td>$i</td>
-                                    <td>{$post['title']}</td>
+                                    <td>" . htmlspecialchars($post['title']) . "</td>
                                     <td>{$post['category_name']}</td>
                                     <td>{$tags}</td>
                                     <td><img src='{$img_src}' width='200' height='200'/></td>
                                     <td>{$post['publish_date']}</td>
                                     <td>
                                     <a href='edit.php?id={$post['id']}' class='btn btn-primary'>Edit</a>
+                                    <a href='../post-details.php?view={$post['id']}' class='btn btn-primary'>View</a>
+
                                     <a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$post['id']}' class='btn btn-danger'>Delete</a>
                                     </td>
                                     </tr>";

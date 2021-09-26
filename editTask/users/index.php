@@ -68,6 +68,8 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
     <div class="container">
 
         <div class="row">
+        <div class="col-md-2"><a href="add.php" class="btn btn-success">Add User</a></div>
+
             <div class="col-lg-12">
                 <div class="all-blog-posts">
                     <div class="row">
@@ -118,6 +120,7 @@ $posts = ['data'=>[],'count'=>100,'order_field'=>'title','order_by'=>'asc']
                                     <td>{$user['active']}</td>
                                     <td>
                                     <a onclick='return confirm(\"Are you sure ?\")' href='delete.php?id={$user['id']}' class='btn btn-danger'>Delete</a>
+                                    <a  href='edit.php?id={$user['id']}' class='btn btn-danger'>Edit</a>
                                     <button id={$blockID} class ='btn' type='button' onclick='blockUser({$user['id']})' style='display:{$blockDISPLAY}'>Block</button>
                                     <button id={$unblockID} class ='btn' type='button' onclick='unblockUser({$user['id']})' style='display:{$unblockDISPLAY}'>unBlock</button>
                                     </td></tr>";

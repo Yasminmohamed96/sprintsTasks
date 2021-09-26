@@ -1,7 +1,7 @@
 <?php
 
 require_once('../config.php');
-require_once(BASE_PATH . '/logic/posts.php');
+require_once(BASE_PATH . '/logic/users.php');
 require_once(BASE_PATH . '/logic/auth.php');
 require_once(BASE_PATH . '/logic/tags.php');
 require_once(BASE_PATH . '/logic/categories.php');
@@ -11,22 +11,23 @@ if (!isset($_REQUEST['id'])) {
     die();
 }
 $id = $_REQUEST['id'];
-$users = getUserById($id);
-if (!checkIfUserIsAdmin($users)) {
+$user = getUserById($id);
+if (!checkIfUserIsAdmin($user)) {
     header('Location:index.php');
     die();
 }
 
 if (isset($_REQUEST['name'])) {
-    $errors = validatePostEdit($_REQUEST);
+    $errors = validateUserEdit($_REQUEST);
     if (count($errors) == 0) {
-            header('Location:index.php');
-            die();
-        } else {
+         if (editUser($id,$_REQUEST)) {
+        header('Location:index.php');
+        die();
+    } else {
             $generic_error = "Error while edit the user";
         }
     }
-
+}
 require_once(BASE_PATH . '/layout/header.php');
 ?>
 <!-- Page Content -->
